@@ -149,7 +149,7 @@ def generate_data(asin):
     return product_data
 
 
-asins = ['B0BCX8P7LL']  # HERE modify list of ASINs to scrape
+asins = ['B0BCX8P7LL', 'B0C67N355H', 'B0CX44G88R']  # HERE modify list of ASINs to scrape
 
 all_products = []
 for asin in asins:
