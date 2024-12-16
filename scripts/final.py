@@ -103,13 +103,29 @@ def get_reviews(asin):
             url = f'https://www.amazon.com/product-reviews/{asin}/ref=cm_cr_arp_d_viewopt_srt?ie=UTF8&reviewerType=all_reviews&sortBy=recent&filterByStar={star}&pageNumber={page}'
             soup = get_page(url)
             if soup:
-                review_content = soup.find_all("div", {"data-hook": "review"})  # issue this is returning an empty list
+                review_content = soup.find_all("div", {"data-hook": "review"})
                 for review in review_content:
                     star_rating = review.find("span", {"class": "a-icon-alt"}).get_text().replace(" out of 5 stars", "")
+                    content = review.find("span", {"data-hook": "review-body"}).get_text().strip()
+                    date_string = review.find("span", {"data-hook": "review-date"}).get_text().strip().replace("Reviewed in ", "")
+                    location, date = date_string.split(" on ")
+                    location = location.replace("the ", "").strip()  # removes "the" if it exists from the location
+                    flavor = ""  # defaults to empty string
+                    size = ""
+                    details = review.find("a", {"data-hook": "format-strip"})
+                    if details:
+                        details = details.get_text().strip()
+                        if "Size:" in details:
+                            flavor, size = details.split("Size:")
+                        else:
+                            flavor = details
                     review_data = {
                         'rating': star_rating,
-                        'content': review.find("span", {"data-hook": "review-body"}).get_text().strip(),
-                        'date': review.find("span", {"data-hook": "review-date"}).get_text().strip().split("on ")[-1]
+                        'content': content,
+                        'date': date,
+                        'location': location,
+                        'flavor': flavor.replace("Flavor Name:", "").strip(),
+                        'size': size.strip()
                     }
                     reviews.append(review_data)
                     review_counts[star] += 1
@@ -133,7 +149,7 @@ def generate_data(asin):
     return product_data
 
 
-asins = ['B0BCX8P7LL', 'B0CX44G88R']  # HERE modify list of ASINs to scrape
+asins = ['B0BCX8P7LL']  # HERE modify list of ASINs to scrape
 
 all_products = []
 for asin in asins:
