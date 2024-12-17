@@ -3,6 +3,7 @@ import json
 import requests
 from dotenv import load_dotenv
 import os
+import hashlib
 
 load_dotenv()
 
@@ -106,10 +107,15 @@ def get_reviews(asin):
                 review_content = soup.find_all("div", {"data-hook": "review"})
                 for review in review_content:
                     star_rating = review.find("span", {"class": "a-icon-alt"}).get_text().replace(" out of 5 stars", "")
+                    title_element = review.find("a", {"data-hook": "review-title"}).get_text().strip()
+                    title = title_element.split("out of 5 stars")[-1].strip()
                     content = review.find("span", {"data-hook": "review-body"}).get_text().strip()
+                    # get and split date and location of purchase
                     date_string = review.find("span", {"data-hook": "review-date"}).get_text().strip().replace("Reviewed in ", "")
                     location, date = date_string.split(" on ")
                     location = location.replace("the ", "").strip()  # removes "the" if it exists from the location
+
+                    # get and split flavor and size
                     flavor = ""  # defaults to empty string
                     size = ""
                     details = review.find("a", {"data-hook": "format-strip"})
@@ -119,13 +125,34 @@ def get_reviews(asin):
                             flavor, size = details.split("Size:")
                         else:
                             flavor = details
+
+                    # get helpfulness upvotes and type of purchase (verified vs. free product)
+                    helpful = review.find("span", {"data-hook": "helpful-vote-statement"})
+                    if helpful:
+                        helpful = helpful.get_text().strip()
+                    else:
+                        helpful = ""
+
+                    type = ""
+                    verified = review.find("span", {"data-hook": "avp-badge"})
+                    review_strip = review.find("div", {"class": "a-row a-spacing-mini review-data review-format-strip"})
+                    vine = "Vine Customer Review" in review_strip.get_text().strip()
+                    if verified:
+                        type = verified.get_text().strip()
+                    elif vine:
+                        type = "Amazon Vine Customer Review of Free Product"
+
                     review_data = {
+                        'id': hashlib.md5(f'{asin}_{star_rating}_{date}_{location}_{content}'.encode()).hexdigest(),
                         'rating': star_rating,
+                        'title': title,
                         'content': content,
                         'date': date,
                         'location': location,
                         'flavor': flavor.replace("Flavor Name:", "").strip(),
-                        'size': size.strip()
+                        'size': size.strip(),
+                        'helpful': helpful,
+                        'type': type
                     }
                     reviews.append(review_data)
                     review_counts[star] += 1
