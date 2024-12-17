@@ -178,7 +178,11 @@ def generate_data(asin):
     return product_data
 
 
-asins = ['B0BCX8P7LL', 'B0C67N355H', 'B0CX44G88R']  # HERE modify list of ASINs to scrape
+# for wonderbelly
+# asins = ['B0BCX8P7LL', 'B0C67N355H', 'B0CX44G88R']  # HERE modify list of ASINs to scrape
+
+# for competitors
+asins = ['B07B9P16WJ', 'B002D4MZ2W', 'B0014D3MFC', 'B08QG2RFW7']
 
 all_products = []
 for asin in asins:
@@ -186,7 +190,7 @@ for asin in asins:
     if product_data:
         all_products.append(product_data)
 
-with open('amazon_data.json', 'w', encoding='utf-8') as f:
+with open('competitor_data.json', 'w', encoding='utf-8') as f:
     json.dump(all_products, f, indent=4, ensure_ascii=False)
 
 print("JSON file created successfully.")
