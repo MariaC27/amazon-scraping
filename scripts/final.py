@@ -4,6 +4,7 @@ import requests
 from dotenv import load_dotenv
 import os
 import hashlib
+from datetime import datetime
 
 load_dotenv()
 
@@ -114,6 +115,7 @@ def get_reviews(asin):
                     date_string = review.find("span", {"data-hook": "review-date"}).get_text().strip().replace("Reviewed in ", "")
                     location, date = date_string.split(" on ")
                     location = location.replace("the ", "").strip()  # removes "the" if it exists from the location
+                    date = datetime.strptime(date, "%B %d, %Y").strftime("%Y-%m-%d")
 
                     # get and split flavor and size
                     flavor = ""  # defaults to empty string
