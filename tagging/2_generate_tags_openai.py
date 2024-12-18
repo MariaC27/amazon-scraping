@@ -36,7 +36,7 @@ def make_api_request(text_input):
     return response
 
 
-with open('wb_data.json', 'r') as file:
+with open('data/all_data.json', 'r') as file:
     data = json.load(file)
 
 text = json.dumps(data, indent=2)
