@@ -14,7 +14,7 @@ OPEN_AI_KEY = os.getenv('OPEN_AI_KEY')
 
 client = OpenAI(api_key=OPEN_AI_KEY)
 
-with open('data/wb_data/wb_data.json', 'r') as file:
+with open('data/competitor_data/competitor_data.json', 'r') as file:
     data = json.load(file)
 
 
@@ -45,7 +45,7 @@ with open('tagged_data.csv', 'w', newline='') as csvfile:
 
 # get tags from csv file
 tags = []
-with open('gemini_tags.csv', 'r') as tagfile:
+with open('data/tags/gemini_tags.csv', 'r') as tagfile:
     tagreader = csv.reader(tagfile)
     next(tagreader, None)  # skip the header row
     for row in tagreader:
